@@ -31,7 +31,7 @@ foreach ($vsVersion in $vsVersions) {
 
 #region install VS Addins
 #region install TrudAX VS Addin
-$repo = "TrudAX/TRUDUtilsD365"
+$repo = "juliomutley/TRUDUtilsD365"
 $releases = "https://api.github.com/repos/$repo/releases"
 $path = "C:\Temp\Addin"
 

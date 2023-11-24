@@ -113,9 +113,12 @@ function Invoke-VSInstallExtension {
     Write-Host "Installation of $($PackageName) complete!"
 }
 
-Invoke-VSInstallExtension -PackageName 'ViktarKarpach.DebugAttachManager'
-Invoke-VSInstallExtension -PackageName 'cpmcgrath.Codealignment'
+Invoke-VSInstallExtension -PackageName 'AlexPendleton.LocateinTFS2017'
+Invoke-VSInstallExtension -PackageName 'cpmcgrath.Codealignment-2019'
+Invoke-VSInstallExtension -PackageName 'EWoodruff.VisualStudioSpellCheckerVS2017andLater'
+Invoke-VSInstallExtension -PackageName 'MadsKristensen.OpeninVisualStudioCode'
 Invoke-VSInstallExtension -PackageName 'MadsKristensen.TrailingWhitespaceVisualizer'
+Invoke-VSInstallExtension -PackageName 'ViktarKarpach.DebugAttachManager'
 #endregion install VS Addins
 
 #region run windows update

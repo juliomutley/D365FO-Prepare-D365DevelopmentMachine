@@ -415,7 +415,7 @@ $DiposableTables | ForEach-Object {
 
     $sql = "EXEC sp_msforeachtable 
     @command1 ='drop table ?'
-    ,@whereand = ' And Object_id In (Select Object_id FROM SYS.OBJECTS AS O WITH (NOLOCK), SYS.SCHEMAS AS S WITH (NOLOCK) WHERE S.NAME = ''DBO'' AND S.SCHEMA_ID = O.SCHEMA_ID AND O.TYPE = ''U'' AND O.NAME LIKE ''DMF_[0-9]%'')' "
+    ,@whereand = ' And Object_id In (Select Object_id FROM SYS.OBJECTS AS O WITH (NOLOCK), SYS.SCHEMAS AS S WITH (NOLOCK) WHERE S.NAME = ''DBO'' AND S.SCHEMA_ID = O.SCHEMA_ID AND O.TYPE = ''U'' AND O.NAME LIKE ''DMF[_][0-9a-zA-Z]%'')' "
     Execute-Sql -server "." -database "AxDB" -command $sql
 
     Write-Host "purging disposable large tables data"

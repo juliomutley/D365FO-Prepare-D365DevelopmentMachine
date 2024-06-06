@@ -1,4 +1,4 @@
-﻿<# Prepare-D365DevelopmentMachine
+<# Prepare-D365DevelopmentMachine
  #
  # Preparation:
  # So that the installations do not step on each other: First run windows updates, also
@@ -185,7 +185,7 @@ $Module2Service | ForEach-Object {
 }
 #endregion
 
-Install-D365SupportingSoftware -Name "7zip" , "adobereader" , "azure-cli" , "azure-data-studio" , "azurepowershell" , "dotnetcore" , "fiddler" , "git.install" , "googlechrome" , "notepadplusplus.install" , "p4merge" , "postman" , "sysinternals" , "visualstudio-codealignment" , "vscode-azurerm-tools" , "vscode-powershell" , "vscode", "winmerge"
+Install-D365SupportingSoftware -Name "7zip" , "adobereader" , "azure-cli" , "azure-data-studio" , "azurepowershell" , "dotnetcore" , "fiddler" , "git.install" , "googlechrome" , "notepadplusplus.install" , "p4merge" , "postman" , "sysinternals" , "vscode", "visualstudio-codealignment" , "vscode-azurerm-tools" , "vscode-powershell" , "winmerge"
 
 Write-Host "Setting web browser homepage to the local environment"
 Get-D365Url | Set-D365StartPage
@@ -318,6 +318,8 @@ If (Test-Path "HKLM:\Software\Microsoft\Microsoft SQL Server\Instance Names\SQL"
 
     Write-Host "Adding trace flags"
     Enable-DbaTraceFlag -SqlInstance . -TraceFlag 174, 834, 1204, 1222, 1224, 2505, 7412
+
+    Set-DbaPrivilege -Type LPIM,IFI
 
     Write-Host "Restarting service"
     Restart-DbaService -Type Engine -Force

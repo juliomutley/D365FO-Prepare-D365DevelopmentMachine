@@ -16,22 +16,11 @@
  #>
 
 #region Update visual studio
-Get-Process devenv | Stop-Process
+Get-Process devenv | Stop-Process -ErrorAction Ignore
 
-$vsVersions = @("2017", "2019")
+dotnet tool update -g dotnet-vs
+vs update --all
 
-Write-Host Downloading files
-foreach ($vsVersion in $vsVersions) {
-    Write-Information "Updating vs$vsversion"
-    Start-Process -Wait `
-    -FilePath "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vs_installer.exe" `
-    -ArgumentList "update --passive --norestart --installpath ""C:\Program Files (x86)\Microsoft Visual Studio\$vsVersion\Professional"""
-}
-
-Write-Information "Updating vs 2022"
-Start-Process -Wait `
--FilePath "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vs_installer.exe" `
--ArgumentList "update --passive --norestart --installpath ""C:\Program Files\Microsoft Visual Studio\2022\Professional"""
 #endregion
 
 #region install VS Addins

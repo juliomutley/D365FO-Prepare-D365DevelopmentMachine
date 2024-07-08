@@ -113,7 +113,7 @@ function Invoke-VSInstallExtension {
         Start-Process -Filepath "$($VSInstallDir)\VSIXInstaller" -ArgumentList "/q /a $($VsixLocation)" -Wait
 
         Write-Host "Cleanup..."
-        Remove-Item $VsixLocation
+        Remove-Item $VsixLocation -Force -Confirm:$false
     
         Write-Host "Installation of $($PackageName) complete!"
     }
@@ -148,7 +148,7 @@ If (!(test-path $path)) {
     New-Item -ItemType Directory -Force -Path $path
 }
 else {
-    Get-ChildItem $path -Recurse | Remove-Item
+    Get-ChildItem $path -Recurse | Remove-Item -Force -Confirm:$false
 }
 
 Set-Location $path
@@ -243,7 +243,7 @@ $Parms = " /Install /Quiet /Norestart /Logs log.txt"
 $Prms = $Parms.Split(" ")
 & "$filepath" $Prms | Out-Null
 
-Remove-Item $folderpath
+Remove-Item $folderpath -Force -Confirm:$false
 Write-Host "SSMS installation complete" -ForegroundColor Green
 #endregion
 
@@ -398,7 +398,7 @@ If (Test-Path "HKLM:\Software\Microsoft\Microsoft SQL Server\Instance Names\SQL"
     $BuildTargets = Test-DbaBuild -SqlInstance . -MaxBehind 0CU -Update | Where-Object { !$PSItem.Compliant } | Select-Object -ExpandProperty BuildTarget -Unique
     Get-DbaBuildReference -Build $BuildTargets | ForEach-Object { Save-DbaKBUpdate -Path $DownloadPath -Name $PSItem.KBLevel };
     Update-DbaInstance -ComputerName . -Path $DownloadPath -Confirm:$false
-    Remove-Item $DownloadPath
+    Remove-Item $DownloadPath -Force -Confirm:$false
 
     Write-Host "Adding trace flags"
     Enable-DbaTraceFlag -SqlInstance . -TraceFlag 174, 834, 1204, 1222, 1224, 2505, 7412

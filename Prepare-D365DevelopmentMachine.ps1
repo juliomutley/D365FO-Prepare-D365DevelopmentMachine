@@ -17,7 +17,7 @@
 
 #region Update visual studio
 Get-Process devenv | Stop-Process -ErrorAction Ignore
-
+dotnet nuget add source "https://api.nuget.org/v3/index.json" --name "nuget.org"
 dotnet tool update -g dotnet-vs
 vs update --all
 

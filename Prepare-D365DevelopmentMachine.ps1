@@ -266,6 +266,7 @@ $Module2Service | ForEach-Object {
         Import-Module $_
     }
 }
+Set-DbatoolsConfig -FullName ‘sql.connection.trustcert’ -Value $true -Register
 #endregion
 
 Install-D365SupportingSoftware -Name "7zip" , "adobereader" , "azure-cli" , "azure-data-studio" , "azurepowershell" , "dotnetcore" , "fiddler" , "git.install" , "googlechrome" , "notepadplusplus.install" , "p4merge" , "postman" , "sysinternals" , "vscode", "visualstudio-codealignment" , "vscode-azurerm-tools" , "vscode-powershell" , "winmerge"

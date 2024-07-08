@@ -20,7 +20,6 @@ Get-Process devenv | Stop-Process -ErrorAction Ignore
 dotnet nuget add source "https://api.nuget.org/v3/index.json" --name "nuget.org"
 dotnet tool update -g dotnet-vs
 vs update --all
-
 #endregion
 
 #region install VS Addins
@@ -51,6 +50,8 @@ foreach ($file in $files) {
 Start-Process "InstallToVS.exe" -Verb runAs
 
 #endregion install TrudAX VS Addin
+
+Install-PackageProvider NuGet -Force
 
 #Install SSD addin - https://shashisadasivan.github.io/SSD365VSAddIn/
 Invoke-Expression (Invoke-WebRequest "https://raw.githubusercontent.com/shashisadasivan/SSD365VSAddIn/master/Misc/install.ps1").Content

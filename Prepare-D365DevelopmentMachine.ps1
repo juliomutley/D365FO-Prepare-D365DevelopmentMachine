@@ -51,8 +51,6 @@ Start-Process "InstallToVS.exe" -Verb runAs
 
 #endregion install TrudAX VS Addin
 
-Install-PackageProvider NuGet -Force
-
 #Install SSD addin - https://shashisadasivan.github.io/SSD365VSAddIn/
 Invoke-Expression (Invoke-WebRequest "https://raw.githubusercontent.com/shashisadasivan/SSD365VSAddIn/master/Misc/install.ps1").Content
 
@@ -211,6 +209,7 @@ Get-ChildItem "K:\DeployablePackages" -Include "*.17.0.vsix" -Recurse | ForEach-
 #endregion install VS Addins
 
 #region run windows update
+Install-PackageProvider NuGet -Force
 Install-Module PSWindowsUpdate
 Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -AutoReboot
 #endregion
@@ -267,7 +266,6 @@ $Module2Service | ForEach-Object {
         Import-Module $_
     }
 }
-Set-DbatoolsConfig -FullName ‘sql.connection.trustcert’ -Value $true -Register
 #endregion
 
 Install-D365SupportingSoftware -Name "7zip" , "adobereader" , "azure-cli" , "azure-data-studio" , "azurepowershell" , "dotnetcore" , "fiddler" , "git.install" , "googlechrome" , "notepadplusplus.install" , "p4merge" , "postman" , "sysinternals" , "vscode", "visualstudio-codealignment" , "vscode-azurerm-tools" , "vscode-powershell" , "winmerge"
@@ -390,12 +388,15 @@ If (Test-Path "HKLM:\Software\Microsoft\Microsoft SQL Server\Instance Names\SQL"
     Invoke-D365InstallAzCopy
 
     Write-Host "Install latest CU"
+    
     $DownloadPath = "C:\temp\SqlKB"
     $PathExists = Test-Path($DownloadPath)
     if ($PathExists -eq $false) {
         mkdir $DownloadPath
     }
-
+    
+    Set-DbatoolsConfig -FullName 'sql.connection.trustcert' -Value $true -Register
+    
     $BuildTargets = Test-DbaBuild -SqlInstance . -MaxBehind 0CU -Update | Where-Object { !$PSItem.Compliant } | Select-Object -ExpandProperty BuildTarget -Unique
     Get-DbaBuildReference -Build $BuildTargets | ForEach-Object { Save-DbaKBUpdate -Path $DownloadPath -Name $PSItem.KBLevel };
     Update-DbaInstance -ComputerName . -Path $DownloadPath -Confirm:$false

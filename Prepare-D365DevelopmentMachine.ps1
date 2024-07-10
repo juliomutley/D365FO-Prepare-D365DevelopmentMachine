@@ -268,7 +268,23 @@ $Module2Service | ForEach-Object {
 }
 #endregion
 
-Install-D365SupportingSoftware -Name "7zip" , "adobereader" , "azure-cli" , "azure-data-studio" , "azurepowershell" , "dotnetcore" , "fiddler" , "git.install" , "googlechrome" , "notepadplusplus.install" , "p4merge" , "postman" , "sysinternals" , "vscode", "visualstudio-codealignment" , "vscode-azurerm-tools" , "vscode-powershell" , "winmerge"
+Install-D365SupportingSoftware -Name "7zip" , "adobereader" , "azure-cli" , "azure-data-studio" , "azurepowershell" , "dotnetcore" , "fiddler" , "git.install", "notepadplusplus.install" , "p4merge" , "postman" , "sysinternals" , "vscode", "winmerge"
+
+#region vscode extensions
+$vsCodeExtensions = @(
+    "adamwalzer.string-converter"
+    ,"DotJoshJohnson.xml"
+    ,"IBM.output-colorizer"
+    ,"mechatroner.rainbow-csv"
+    ,"piotrgredowski.poor-mans-t-sql-formatter-pg"
+    ,"streetsidesoftware.code-spell-checker"
+    ,"ZainChen.json"
+)
+
+$vsCodeExtensions | ForEach-Object {
+    code --install-extension $_
+}
+#endregion
 
 Write-Host "Setting web browser homepage to the local environment"
 Get-D365Url | Set-D365StartPage

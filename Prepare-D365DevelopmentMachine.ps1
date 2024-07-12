@@ -19,7 +19,7 @@
 Get-Process devenv | Stop-Process -ErrorAction Ignore
 dotnet nuget add source "https://api.nuget.org/v3/index.json" --name "nuget.org"
 dotnet tool update -g dotnet-vs
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
+$env:Path = Expand-EnvironmentVariablesRecursively([System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User"))
 vs update --all
 #endregion
 
@@ -244,7 +244,7 @@ $Parms = " /Install /Quiet /Norestart /Logs log.txt"
 $Prms = $Parms.Split(" ")
 & "$filepath" $Prms | Out-Null
 
-Remove-Item $folderpath -Force -Confirm:$false
+Remove-Item $folderpath -Recurse -Force -Confirm:$false
 Write-Host "SSMS installation complete" -ForegroundColor Green
 #endregion
 
@@ -271,7 +271,7 @@ $Module2Service | ForEach-Object {
 
 Install-D365SupportingSoftware -Name "7zip" , "adobereader" , "azure-cli" , "azure-data-studio" , "azurepowershell" , "dotnetcore" , "fiddler" , "git.install", "notepadplusplus.install" , "p4merge" , "postman" , "sysinternals" , "vscode", "winmerge"
 
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
+$env:Path = Expand-EnvironmentVariablesRecursively([System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User"))
 
 #region vscode extensions
 $vsCodeExtensions = @(
@@ -279,6 +279,7 @@ $vsCodeExtensions = @(
     ,"DotJoshJohnson.xml"
     ,"IBM.output-colorizer"
     ,"mechatroner.rainbow-csv"
+    ,"ms-vscode.PowerShell"
     ,"piotrgredowski.poor-mans-t-sql-formatter-pg"
     ,"streetsidesoftware.code-spell-checker"
     ,"ZainChen.json"
@@ -419,7 +420,7 @@ If (Test-Path "HKLM:\Software\Microsoft\Microsoft SQL Server\Instance Names\SQL"
     $BuildTargets = Test-DbaBuild -SqlInstance . -MaxBehind 0CU -Update | Where-Object { !$PSItem.Compliant } | Select-Object -ExpandProperty BuildTarget -Unique
     Get-DbaBuildReference -Build $BuildTargets | ForEach-Object { Save-DbaKBUpdate -Path $DownloadPath -Name $PSItem.KBLevel };
     Update-DbaInstance -ComputerName . -Path $DownloadPath -Confirm:$false
-    Remove-Item $DownloadPath -Force -Confirm:$false
+    Remove-Item $DownloadPath -Recurse -Force -Confirm:$false
 
     Write-Host "Adding trace flags"
     Enable-DbaTraceFlag -SqlInstance . -TraceFlag 174, 834, 1204, 1222, 1224, 2505, 7412

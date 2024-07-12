@@ -19,6 +19,7 @@
 Get-Process devenv | Stop-Process -ErrorAction Ignore
 dotnet nuget add source "https://api.nuget.org/v3/index.json" --name "nuget.org"
 dotnet tool update -g dotnet-vs
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
 vs update --all
 #endregion
 
@@ -209,9 +210,9 @@ Get-ChildItem "K:\DeployablePackages" -Include "*.17.0.vsix" -Recurse | ForEach-
 #endregion install VS Addins
 
 #region run windows update
-Install-PackageProvider NuGet -Force
-Install-Module PSWindowsUpdate
-Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -AutoReboot
+Install-PackageProvider NuGet -Force -Confirm:$false
+Install-Module PSWindowsUpdate -Force -Confirm:$false
+Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -AutoReboot -Confirm:$false
 #endregion
 
 #region Update SSMS
@@ -269,6 +270,8 @@ $Module2Service | ForEach-Object {
 #endregion
 
 Install-D365SupportingSoftware -Name "7zip" , "adobereader" , "azure-cli" , "azure-data-studio" , "azurepowershell" , "dotnetcore" , "fiddler" , "git.install", "notepadplusplus.install" , "p4merge" , "postman" , "sysinternals" , "vscode", "winmerge"
+
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
 
 #region vscode extensions
 $vsCodeExtensions = @(

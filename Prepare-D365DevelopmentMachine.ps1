@@ -276,6 +276,7 @@ $vsCodeExtensions = @(
     ,"DotJoshJohnson.xml"
     ,"IBM.output-colorizer"
     ,"mechatroner.rainbow-csv"
+    ,"ms-vscode.PowerShell"
     ,"piotrgredowski.poor-mans-t-sql-formatter-pg"
     ,"streetsidesoftware.code-spell-checker"
     ,"ZainChen.json"

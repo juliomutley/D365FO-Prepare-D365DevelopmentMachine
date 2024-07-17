@@ -293,6 +293,27 @@ $vsCodeExtensions | ForEach-Object {
 Write-Host "Setting web browser homepage to the local environment"
 Get-D365Url | Set-D365StartPage
 
+$registryPath = 'HKLM:\Software\Policies\Microsoft\Edge' 
+$regpath = 'HKLM:\Software\Policies\Microsoft\Edge\RestoreOnStartupURLs' 
+$value = 0x00000004 
+$URL= Get-D365Url
+
+if(!(Test-Path $registryPath)) 
+{ 
+    New-Item -Path $registryPath -Force | Out-Null 
+    New-ItemProperty -Path $registryPath -Name RestoreOnStartup -Value $value -PropertyType DWORD -Force | Out-Null
+} 
+ELSE 
+{
+    New-ItemProperty -Path $registryPath -Name RestoreOnStartup -Value $value -PropertyType DWORD -Force | Out-Null
+} 
+
+Set-Location $registrypath 
+New-Item -Name RestoreOnStartupURLs -Force 
+Set-Itemproperty -Path $regpath -Name 1 -Value $URL
+
+Write-Host "The homepage has been set as: $URL" 
+
 Write-Host "Setting Management Reporter to manual startup to reduce churn and Event Log messages"
 Get-D365Environment -FinancialReporter | Set-Service -StartupType Manual
 

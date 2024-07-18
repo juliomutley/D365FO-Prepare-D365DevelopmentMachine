@@ -245,13 +245,14 @@ Remove-Item $folderpath -Recurse -Force -Confirm:$false
 Write-Host "SSMS installation complete" -ForegroundColor Green
 #endregion
 
-#region Installing d365fo.tools
+#region Installing powershell modules
 # This is requried by Find-Module, by doing it beforehand we remove some warning messages
 Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 
-# Installing d365fo.tools
-$Module2Service = $('dbatools',
-    'd365fo.tools')
+# Installing powershell modules
+$Module2Service = $('Az'
+    ,'dbatools'
+    ,'d365fo.tools')
 
 $Module2Service | ForEach-Object {
     if (Get-Module -ListAvailable -Name $_) {
@@ -260,13 +261,13 @@ $Module2Service | ForEach-Object {
     } 
     else {
         Write-Host "Installing " + $_
-        Install-Module -Name $_ -SkipPublisherCheck -Scope AllUsers
+        Install-Module -Name $_ -SkipPublisherCheck -Scope AllUsers -AllowClobber -Forcesn
         Import-Module $_
     }
 }
 #endregion
 
-Install-D365SupportingSoftware -Name "7zip" , "adobereader" , "azure-cli" , "azure-data-studio" , "azurepowershell" , "dotnetcore" , "fiddler" , "git.install", "notepadplusplus.install" , "p4merge" , "postman" , "sysinternals" , "vscode", "winmerge"
+Install-D365SupportingSoftware -Name "7zip", "adobereader", "azure-data-studio", "dotnetcore", "fiddler", "git.install", "notepadplusplus.install", "p4merge", "postman", "sysinternals", "vscode", "winmerge"
 
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
 

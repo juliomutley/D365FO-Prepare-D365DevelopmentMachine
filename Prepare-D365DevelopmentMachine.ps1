@@ -564,7 +564,6 @@ $DiposableTables | ForEach-Object {
     Execute-Sql -server "." -database "DYNAMICSXREFDB" -command $sql
 
     Write-Host "Reclaiming freed database space"
-    Invoke-DbaDbShrink -SqlInstance . -Database "AxDb" -FileType Data
     Invoke-DbaDbShrink -SqlInstance . -Database "AxDb", "DYNAMICSXREFDB" -FileType Data
 
     Write-Host "Running Ola Hallengren's IndexOptimize tool"

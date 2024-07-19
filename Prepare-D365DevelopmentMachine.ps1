@@ -252,7 +252,8 @@ Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 # Installing powershell modules
 $Module2Service = $('Az'
     ,'dbatools'
-    ,'d365fo.tools')
+    ,'d365fo.tools'
+    , 'SqlServer')
 
 $Module2Service | ForEach-Object {
     if (Get-Module -ListAvailable -Name $_) {
@@ -417,7 +418,6 @@ If (Test-Path "HKLM:\Software\Microsoft\Microsoft SQL Server\Instance Names\SQL"
     Set-DbaMaxMemory -SqlInstance . -Max $memoryForSqlServer
 
     Write-Host "Installing Ola Hallengren's SQL Maintenance scripts"
-    Import-Module -Name dbatools
     Install-DbaMaintenanceSolution -SqlInstance . -Database master
 
     Write-Host "Installing FirstAidResponder PowerShell module"
@@ -577,6 +577,9 @@ $DiposableTables | ForEach-Object {
         @FragmentationLevel1 = 5,
         @FragmentationLevel2 = 25,
         @LogToTable = 'N',
+        @MaxDOP = 0,
+        @Sort_in_TempDB = 'Y',
+        @Online = 'N',
         @UpdateStatistics = 'ALL',
         @OnlyModifiedStatistics = 'Y'"
 
@@ -585,7 +588,8 @@ $DiposableTables | ForEach-Object {
     Write-Host "Reclaiming database log space"
     Invoke-DbaDbShrink -SqlInstance . -Database "AxDb", "DYNAMICSXREFDB" -FileType Log -ShrinkMethod TruncateOnly
 
-    Set-DbaMaxMemory -SqlInstance . -Max 4096
+    $memoryForSqlServer = ($totalServerMemory * 0.15) / 1024 / 1024
+    Set-DbaMaxMemory -SqlInstance . -Max $memoryForSqlServer
 }
 Else {
     Write-Verbose "SQL not installed.  Skipped Ola Hallengren's index optimization"

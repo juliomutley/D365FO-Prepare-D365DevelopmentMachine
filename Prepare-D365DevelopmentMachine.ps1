@@ -261,7 +261,7 @@ $Module2Service | ForEach-Object {
     } 
     else {
         Write-Host "Installing " + $_
-        Install-Module -Name $_ -SkipPublisherCheck -Scope AllUsers -AllowClobber -Forcesn
+        Install-Module -Name $_ -SkipPublisherCheck -Scope AllUsers -AllowClobber -Force
         Import-Module $_
     }
 }

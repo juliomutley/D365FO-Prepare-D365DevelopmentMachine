@@ -295,7 +295,7 @@ Get-D365Url | Set-D365StartPage
 $registryPath = 'HKLM:\Software\Policies\Microsoft\Edge' 
 $regpath = 'HKLM:\Software\Policies\Microsoft\Edge\RestoreOnStartupURLs' 
 $value = 0x00000004 
-$URL= Get-D365Url
+$URL = (Get-D365Url).Url
 
 if(!(Test-Path $registryPath)) 
 { 
@@ -500,6 +500,7 @@ $DiposableTables = @(
     ,"SUNTAFRELEASELOGTRANS"
     ,"sysdatabaselog"
     ,"syslastvalue"
+    ,"sysuserlog"
 )
 
 $DiposableTables | ForEach-Object {

@@ -268,7 +268,7 @@ $Module2Service | ForEach-Object {
 }
 #endregion
 
-Install-D365SupportingSoftware -Name "7zip", "adobereader", "azure-data-studio", "dotnetcore", "fiddler", "git.install", "notepadplusplus.install", "p4merge", "postman", "sysinternals", "vscode", "winmerge"
+Install-D365SupportingSoftware -Name "7zip", "adobereader", "azure-data-studio", "dotnetcore", "fiddler", "git.install", "notepadplusplus.install", "postman", "sysinternals", "vscode", "powertoys"
 
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
 

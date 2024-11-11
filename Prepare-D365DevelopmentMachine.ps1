@@ -454,10 +454,10 @@ If (Test-Path "HKLM:\Software\Microsoft\Microsoft SQL Server\Instance Names\SQL"
 
     Write-Host "Setting database options"
     $sql = "ALTER DATABASE [AxDB] SET AUTO_CLOSE OFF"
-    Execute-Sql -server "." -database "AxDB" -command $sql
+    Invoke-DbaQuery -Query $sql -SqlInstance "." -database "AxDB" -QueryTimeout 0
 
     $sql = "ALTER DATABASE [AxDB] SET AUTO_UPDATE_STATISTICS_ASYNC OFF"
-    Execute-Sql -server "." -database "AxDB" -command $sql
+    Invoke-DbaQuery -Query $sql -SqlInstance "." -database "AxDB" -QueryTimeout 0
 
     Write-Host "Setting batchservergroup options"
     $sql = "delete batchservergroup where SERVERID <> 'Batch:'+@@servername
@@ -465,7 +465,7 @@ If (Test-Path "HKLM:\Software\Microsoft\Microsoft SQL Server\Instance Names\SQL"
     insert into batchservergroup(GROUPID, SERVERID, RECID, RECVERSION, CREATEDDATETIME, CREATEDBY)
     select GROUP_, 'Batch:'+@@servername, 5900000000 + cast(CRYPT_GEN_RANDOM(4) as bigint), 1, GETUTCDATE(), '-admin-' from batchgroup
         where not EXISTS (select recid from batchservergroup where batchservergroup.GROUPID = batchgroup.GROUP_)"
-    Execute-Sql -server "." -database "AxDB" -command $sql
+    Invoke-DbaQuery -Query $sql -SqlInstance "." -database "AxDB" -QueryTimeout 0
 
     Write-Host "purging disposable data"
 
@@ -506,13 +506,13 @@ $DiposableTables = @(
 $DiposableTables | ForEach-Object {
     Write-Host "purging $_"
     $sql = "truncate table $_"
-    Execute-Sql -server "." -database "AxDB" -command $sql
+    Invoke-DbaQuery -Query $sql -SqlInstance "." -database "AxDB" -QueryTimeout 0
 }
     
     Write-Host "purging disposable batch job data"
     $sql = "delete batchjob where status in (3, 4, 8)
     delete batch where not exists (select recid from batchjob where batch.BATCHJOBID = BATCHJOB.recid)"
-    Execute-Sql -server "." -database "AxDB" -command $sql
+    Invoke-DbaQuery -Query $sql -SqlInstance "." -database "AxDB" -QueryTimeout 0
 
     Write-Host "purging staging tables data"
     $sql = "EXEC sp_msforeachtable
@@ -520,41 +520,41 @@ $DiposableTables | ForEach-Object {
     ,@whereand = ' And Object_id In (Select Object_id From sys.objects
     Where name like ''%staging'')'"
 
-    Execute-Sql -server "." -database "AxDB" -command $sql
+    Invoke-DbaQuery -Query $sql -SqlInstance "." -database "AxDB" -QueryTimeout 0
 
     Write-Host "purging disposable report data"
     $sql = "EXEC sp_msforeachtable
     @command1 ='truncate table ?'
     ,@whereand = ' And Object_id In (Select Object_id From sys.objects
     Where name like ''%tmp'')'"
-    Execute-Sql -server "." -database "AxDB" -command $sql
+    Invoke-DbaQuery -Query $sql -SqlInstance "." -database "AxDB" -QueryTimeout 0
 
     Write-Host "dropping temp tables"
     $sql = "EXEC sp_msforeachtable 
     @command1 ='drop table ?'
     ,@whereand = ' And Object_id In (Select Object_id FROM SYS.OBJECTS AS O WITH (NOLOCK), SYS.SCHEMAS AS S WITH (NOLOCK) WHERE S.NAME = ''DBO'' AND S.SCHEMA_ID = O.SCHEMA_ID AND O.TYPE = ''U'' AND O.NAME LIKE ''T[0-9]%'')' "
-    Execute-Sql -server "." -database "AxDB" -command $sql
+    Invoke-DbaQuery -Query $sql -SqlInstance "." -database "AxDB" -QueryTimeout 0
 
     Write-Host "dropping oledb error tmp tables"
     $sql = "EXEC sp_msforeachtable 
     @command1 ='drop table ?'
     ,@whereand = ' And Object_id In (Select Object_id FROM SYS.OBJECTS AS O WITH (NOLOCK), SYS.SCHEMAS AS S WITH (NOLOCK) WHERE S.NAME = ''DBO'' AND S.SCHEMA_ID = O.SCHEMA_ID AND O.TYPE = ''U'' AND O.NAME LIKE ''DMF_OLEDB_Error_%'')' "
-    Execute-Sql -server "." -database "AxDB" -command $sql
+    Invoke-DbaQuery -Query $sql -SqlInstance "." -database "AxDB" -QueryTimeout 0
 
     $sql = "EXEC sp_msforeachtable 
     @command1 ='drop table ?'
     ,@whereand = ' And Object_id In (Select Object_id FROM SYS.OBJECTS AS O WITH (NOLOCK), SYS.SCHEMAS AS S WITH (NOLOCK) WHERE S.NAME = ''DBO'' AND S.SCHEMA_ID = O.SCHEMA_ID AND O.TYPE = ''U'' AND O.NAME LIKE ''DMF_FLAT_Error_%'')' "
-    Execute-Sql -server "." -database "AxDB" -command $sql
+    Invoke-DbaQuery -Query $sql -SqlInstance "." -database "AxDB" -QueryTimeout 0
 
     $sql = "EXEC sp_msforeachtable 
     @command1 ='drop table ?'
     ,@whereand = ' And Object_id In (Select Object_id FROM SYS.OBJECTS AS O WITH (NOLOCK), SYS.SCHEMAS AS S WITH (NOLOCK) WHERE S.NAME = ''DBO'' AND S.SCHEMA_ID = O.SCHEMA_ID AND O.TYPE = ''U'' AND O.NAME LIKE ''DMF[_][0-9a-zA-Z]%'')' "
-    Execute-Sql -server "." -database "AxDB" -command $sql
+    Invoke-DbaQuery -Query $sql -SqlInstance "." -database "AxDB" -QueryTimeout 0
 
     Write-Host "purging disposable large tables data"
     $LargeTables | ForEach-Object {
         $sql = "delete $_ where $_.CREATEDDATETIME < dateadd(""MM"", -2, getdate())"
-        Execute-Sql -server "." -database "AxDB" -command $sql
+        Invoke-DbaQuery -Query $sql -SqlInstance "." -database "AxDB" -QueryTimeout 0
     }
 
     $sql = "DELETE [REFERENCES] FROM [REFERENCES]
@@ -562,7 +562,7 @@ $DiposableTables | ForEach-Object {
     JOIN Modules ON Names.ModuleId = Modules.Id
     WHERE Module LIKE '%Test%' AND Module <> 'TestEssentials'"
 
-    Execute-Sql -server "." -database "DYNAMICSXREFDB" -command $sql
+    Invoke-DbaQuery -Query $sql -SqlInstance "." -database "DYNAMICSXREFDB" -QueryTimeout 0
 
     Write-Host "Reclaiming freed database space"
     Invoke-DbaDbShrink -SqlInstance . -Database "AxDb", "DYNAMICSXREFDB" -FileType Data

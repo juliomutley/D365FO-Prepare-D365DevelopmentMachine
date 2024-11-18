@@ -538,16 +538,6 @@ $DiposableTables | ForEach-Object {
     Write-Host "dropping oledb error tmp tables"
     $sql = "EXEC sp_msforeachtable 
     @command1 ='drop table ?'
-    ,@whereand = ' And Object_id In (Select Object_id FROM SYS.OBJECTS AS O WITH (NOLOCK), SYS.SCHEMAS AS S WITH (NOLOCK) WHERE S.NAME = ''DBO'' AND S.SCHEMA_ID = O.SCHEMA_ID AND O.TYPE = ''U'' AND O.NAME LIKE ''DMF_OLEDB_Error_%'')' "
-    Invoke-DbaQuery -Query $sql -SqlInstance "." -database "AxDB" -QueryTimeout 0
-
-    $sql = "EXEC sp_msforeachtable 
-    @command1 ='drop table ?'
-    ,@whereand = ' And Object_id In (Select Object_id FROM SYS.OBJECTS AS O WITH (NOLOCK), SYS.SCHEMAS AS S WITH (NOLOCK) WHERE S.NAME = ''DBO'' AND S.SCHEMA_ID = O.SCHEMA_ID AND O.TYPE = ''U'' AND O.NAME LIKE ''DMF_FLAT_Error_%'')' "
-    Invoke-DbaQuery -Query $sql -SqlInstance "." -database "AxDB" -QueryTimeout 0
-
-    $sql = "EXEC sp_msforeachtable 
-    @command1 ='drop table ?'
     ,@whereand = ' And Object_id In (Select Object_id FROM SYS.OBJECTS AS O WITH (NOLOCK), SYS.SCHEMAS AS S WITH (NOLOCK) WHERE S.NAME = ''DBO'' AND S.SCHEMA_ID = O.SCHEMA_ID AND O.TYPE = ''U'' AND O.NAME LIKE ''DMF[_][0-9a-zA-Z]%'')' "
     Invoke-DbaQuery -Query $sql -SqlInstance "." -database "AxDB" -QueryTimeout 0
 

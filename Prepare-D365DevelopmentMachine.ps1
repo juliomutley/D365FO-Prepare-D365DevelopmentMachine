@@ -459,14 +459,23 @@ If (Test-Path "HKLM:\Software\Microsoft\Microsoft SQL Server\Instance Names\SQL"
     $sql = "ALTER DATABASE [AxDB] SET AUTO_UPDATE_STATISTICS_ASYNC OFF"
     Invoke-DbaQuery -Query $sql -SqlInstance "." -database "AxDB" -QueryTimeout 0
 
+    Write-Host "enabling users"
+    $sql = "UPDATE USERINFO SET enable = 1 WHERE id NOT IN ('axrunner', 'Guest')"
+    Invoke-DbaQuery -SqlInstance "." -Database "AxDB" -Query $sql -QueryTimeout 0
+    
+    Write-Host "Setting Server configurations"
+    $sql = "WITH ServerConfigCTE AS ( SELECT top 1 SERVERID, @@servername AS NewServerID FROM SYSSERVERCONFIG ) UPDATE ServerConfigCTE SET SERVERID = 'Batch:' + NewServerID"
+    Invoke-DbaQuery -SqlInstance "." -Database "AxDB" -Query $sql -QueryTimeout 0
+    $sql = "delete SYSSERVERCONFIG where SERVERID <> 'Batch:' + @@servername"
+    Invoke-DbaQuery -SqlInstance "." -Database "AxDB" -Query $sql -QueryTimeout 0
+
     Write-Host "Setting batchservergroup options"
-    $sql = "delete batchservergroup where SERVERID <> 'Batch:'+@@servername
-
+    $sql = "delete batchservergroup where SERVERID <> 'Batch:$server'
+    
     insert into batchservergroup(GROUPID, SERVERID, RECID, RECVERSION, CREATEDDATETIME, CREATEDBY)
-    select GROUP_, 'Batch:'+@@servername, 5900000000 + cast(CRYPT_GEN_RANDOM(4) as bigint), 1, GETUTCDATE(), '-admin-' from batchgroup
+    select GROUP_, 'Batch:@@SERVERNAME, 5900000000 + cast(CRYPT_GEN_RANDOM(4) as bigint), 1, GETUTCDATE(), '-admin-' from batchgroup
         where not EXISTS (select recid from batchservergroup where batchservergroup.GROUPID = batchgroup.GROUP_)"
-    Invoke-DbaQuery -Query $sql -SqlInstance "." -database "AxDB" -QueryTimeout 0
-
+    Invoke-DbaQuery -SqlInstance "." -Database "AxDB" -Query $sql -QueryTimeout 0
     Write-Host "purging disposable data"
 
 $DiposableTables = @(
@@ -535,7 +544,7 @@ $DiposableTables | ForEach-Object {
     ,@whereand = ' And Object_id In (Select Object_id FROM SYS.OBJECTS AS O WITH (NOLOCK), SYS.SCHEMAS AS S WITH (NOLOCK) WHERE S.NAME = ''DBO'' AND S.SCHEMA_ID = O.SCHEMA_ID AND O.TYPE = ''U'' AND O.NAME LIKE ''T[0-9]%'')' "
     Invoke-DbaQuery -Query $sql -SqlInstance "." -database "AxDB" -QueryTimeout 0
 
-    Write-Host "dropping oledb error tmp tables"
+    Write-Host "dropping DMF temp tables"
     $sql = "EXEC sp_msforeachtable 
     @command1 ='drop table ?'
     ,@whereand = ' And Object_id In (Select Object_id FROM SYS.OBJECTS AS O WITH (NOLOCK), SYS.SCHEMAS AS S WITH (NOLOCK) WHERE S.NAME = ''DBO'' AND S.SCHEMA_ID = O.SCHEMA_ID AND O.TYPE = ''U'' AND O.NAME LIKE ''DMF[_][0-9a-zA-Z]%'')' "
@@ -562,13 +571,12 @@ $DiposableTables | ForEach-Object {
     $sql = "EXECUTE master.dbo.IndexOptimize
         @Databases = 'ALL_DATABASES',
         @FragmentationLow = NULL,
-        @FragmentationMedium = 'INDEX_REORGANIZE,INDEX_REBUILD_ONLINE,INDEX_REBUILD_OFFLINE',
-        @FragmentationHigh = 'INDEX_REBUILD_ONLINE,INDEX_REBUILD_OFFLINE',
+        @FragmentationMedium = 'INDEX_REBUILD_OFFLINE',
+        @FragmentationHigh = 'INDEX_REBUILD_OFFLINE',
         @FragmentationLevel1 = 5,
         @FragmentationLevel2 = 25,
         @LogToTable = 'N',
         @MaxDOP = 0,
-        @Sort_in_TempDB = 'Y',
         @Online = 'N',
         @UpdateStatistics = 'ALL',
         @OnlyModifiedStatistics = 'Y'"

@@ -25,7 +25,6 @@ vs update --all
 
 #region install VS Addins
 #region install TrudAX VS Addin
-#$repo = "juliomutley/TRUDUtilsD365" # VS2019
 $repo = "TrudAX/TRUDUtilsD365" # VS 2022
 $releases = "https://api.github.com/repos/$repo/releases"
 $path = "C:\Temp\Addin"
@@ -48,8 +47,28 @@ foreach ($file in $files) {
     Invoke-WebRequest $download -Out $file
     Unblock-File $file
 }
-Start-Process "InstallToVS.exe" -Verb runAs
+# Accessing the Documents folder using environment variables
+$documentsFolder = Join-Path $env:USERPROFILE 'Documents'
 
+$xmlFilePath = "$documentsFolder\Visual Studio Dynamics 365\DynamicsDevConfig.xml"
+$valueToCheck = "C:\Temp\Addin"
+
+# Load the XML file
+[xml]$xml = Get-Content -Path $xmlFilePath
+
+# Check if the value exists
+if (-not ($xml.DynamicsDevConfig.AddInPaths.string -contains $valueToCheck)) {
+    # Value doesn't exist, add it
+    $newElement = $xml.CreateElement("d2p1", "string", "http://schemas.microsoft.com/2003/10/Serialization/Arrays")
+    $newElement.InnerText = $valueToCheck
+    $xml.DynamicsDevConfig.AddInPaths.AppendChild($newElement)
+
+    # Save the modified XML back to a file
+    $xml.Save($xmlFilePath)
+    Write-Host "Element added successfully."
+}
+
+Set-Location $currentPath
 #endregion install TrudAX VS Addin
 
 # Based on https://gist.github.com/ScottHutchinson/b22339c3d3688da5c9b477281e258400
@@ -268,7 +287,7 @@ $Module2Service | ForEach-Object {
 }
 #endregion
 
-Install-D365SupportingSoftware -Name "7zip", "adobereader", "azure-data-studio", "dotnetcore", "fiddler", "git.install", "notepadplusplus.install", "postman", "sysinternals", "vscode", "powertoys"
+Install-D365SupportingSoftware -Name "7zip", "adobereader", "dotnetcore", "fiddler", "git.install", "notepadplusplus.install", "postman", "sysinternals", "vscode", "powertoys"
 
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
 
@@ -278,6 +297,7 @@ $vsCodeExtensions = @(
     ,"DotJoshJohnson.xml"
     ,"IBM.output-colorizer"
     ,"mechatroner.rainbow-csv"
+    ,"ms-mssql.mssql"
     ,"ms-vscode.PowerShell"
     ,"piotrgredowski.poor-mans-t-sql-formatter-pg"
     ,"streetsidesoftware.code-spell-checker"

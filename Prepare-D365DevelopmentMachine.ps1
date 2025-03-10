@@ -42,6 +42,7 @@ if ($updateReg) {
     Set-ItemProperty "$regPath" -Name 'Functions' -Value "$ciphers";
     $ciphers = Get-ItemPropertyValue "$regPath" -Name 'Functions';
     write-host "Values after: $ciphers";
+    Restart-Computer -Force;
 }
 else {
     Write-Host 'No updates needed, the required ciphers already exist.';

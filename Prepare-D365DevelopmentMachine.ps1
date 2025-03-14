@@ -22,6 +22,7 @@
 # gist at https://gist.github.com/FH-Inway/193a2819c2682e203496ae7d44baecdb
 
 # Requires -RunAsAdministrator
+$currentPath = Get-Location
 $ErrorActionPreference = 'Stop';
 $regPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Cryptography\Configuration\SSL\00010002';
 $ciphers = Get-ItemPropertyValue "$regPath" -Name 'Functions';
@@ -49,7 +50,7 @@ else {
 }
 
 #region Update visual studio
-Get-Process devenv | Stop-Process -ErrorAction Ignore
+Stop-Process -Name devenv -ErrorAction Ignore
 dotnet nuget add source "https://api.nuget.org/v3/index.json" --name "nuget.org"
 dotnet tool update -g dotnet-vs
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
@@ -185,7 +186,6 @@ Invoke-VSInstallExtension -Version 2022 -PackageName 'ViktarKarpach.DebugAttachM
 
 Write-Host "Installing TrudUtils"
 
-$currentPath = Get-Location
 #$repo = "juliomutley/TRUDUtilsD365" # VS2019
 $repo = "TrudAX/TRUDUtilsD365" # VS 2022
 

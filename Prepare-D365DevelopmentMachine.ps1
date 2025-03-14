@@ -241,20 +241,23 @@ Set-Location $currentPath
 
 Write-Host "Installing Default Tools and Internal Dev tools"
 
-$VSInstallDir = "C:\Program Files (x86)\Microsoft Visual Studio\Installer\resources\app\ServiceHub\Services\Microsoft.VisualStudio.Setup.Service"
 
-Get-ChildItem "K:\DeployablePackages" -Include "*.vsix" -Exclude "*.17.0.vsix" -Recurse | ForEach-Object {
-    Write-Host "installing: $_"
-    Split-Path -Path $VSInstallDir -Leaf -Resolve
-    Start-Process -Filepath "$($VSInstallDir)\VSIXInstaller" -ArgumentList "/q /a $_" -Wait
-}
+if((Test-Path 'K:\DeployablePackages')) {
+    $VSInstallDir = "C:\Program Files (x86)\Microsoft Visual Studio\Installer\resources\app\ServiceHub\Services\Microsoft.VisualStudio.Setup.Service"
 
-$VSInstallDir = "C:\Program Files\Microsoft Visual Studio\2022\Professional\Common7\IDE\"
+    Get-ChildItem "K:\DeployablePackages" -Include "*.vsix" -Exclude "*.17.0.vsix" -Recurse | ForEach-Object {
+        Write-Host "installing: $_"
+        Split-Path -Path $VSInstallDir -Leaf -Resolve
+        Start-Process -Filepath "$($VSInstallDir)\VSIXInstaller" -ArgumentList "/q /a $_" -Wait
+    }
 
-Get-ChildItem "K:\DeployablePackages" -Include "*.17.0.vsix" -Recurse | ForEach-Object {
-    Write-Host "installing: $_"
-    Split-Path -Path $VSInstallDir -Leaf -Resolve
-    Start-Process -Filepath "$($VSInstallDir)\VSIXInstaller" -ArgumentList "/q /a $_" -Wait
+    $VSInstallDir = "C:\Program Files\Microsoft Visual Studio\2022\Professional\Common7\IDE\"
+
+    Get-ChildItem "K:\DeployablePackages" -Include "*.17.0.vsix" -Recurse | ForEach-Object {
+        Write-Host "installing: $_"
+        Split-Path -Path $VSInstallDir -Leaf -Resolve
+        Start-Process -Filepath "$($VSInstallDir)\VSIXInstaller" -ArgumentList "/q /a $_" -Wait
+    }
 }
 #endregion install VS Addins
 

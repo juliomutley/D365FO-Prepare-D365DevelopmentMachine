@@ -375,6 +375,9 @@ Get-D365Environment -FinancialReporter | Set-Service -StartupType Manual
 Write-Host "Setting Windows Defender rules to speed up compilation time"
 Add-D365WindowsDefenderRules -Silent
 
+Write-Host "Enabling IIS Preload"
+Enable-D365IISPreload
+
 #region Local User Policy
 
 # Set the password to never expire

@@ -1,58 +1,131 @@
 # Prepare-D365DevelopmentMachine
-This repository contains a script for preparing a development machine for Dynamics 365 for Finance and Operations by installing additional tools and configuring the operating system automatically.  The script does the following:
+
+This repository contains a script for preparing a development machine for Dynamics 365 for Finance and Operations by
+installing additional tools and configuring the operating system automatically. The script does the following:
+
+## What the script installs
 
 ### Utilities
-*	[Azure PowerShell](https://docs.microsoft.com/en-us/powershell/azure/overview?view=azurermps-6.11.0)
-*	[Azure Command Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/get-started-with-azure-cli?view=azure-cli-latest)
-*	[d365fo.tools](https://github.com/d365collaborative/d365fo.tools), PowerShell commands for Dynamics 365 for Finance and Operations
-*	[dbatools](https://dbatools.io/), PowerShell commands for T-SQL
-*	[Edge](https://www.microsoft.com/en-us/edge)
-*	[Notepad++](https://notepad-plus-plus.org/)
-*	[Ola Hallengren's SQL maintenance solution](https://ola.hallengren.com/)
-*	[Peazip](http://www.peazip.org/)
-*	[Sysinternals tools](https://docs.microsoft.com/en-us/sysinternals/)
-*	[WinMerge](http://winmerge.org/) comparison tool
 
-### Integrations/Interface Testing Utilities
-*	[Fiddler](https://www.telerik.com/fiddler)
-*	[Postman](https://www.getpostman.com/)
-*	[Visual Studio Code](https://code.visualstudio.com/) w/Azure and SQL add-ins
+- [Azure PowerShell (Az)](https://learn.microsoft.com/powershell/azure/what-is-azure-powershell)
+- [Azure CLI](https://learn.microsoft.com/cli/azure/get-started-with-azure-cli)
+- [d365fo.tools](https://github.com/d365collaborative/d365fo.tools) – PowerShell for D365FO
+- [dbatools](https://dbatools.io/) – PowerShell for SQL Server
+- [Microsoft Edge](https://www.microsoft.com/edge)
+- [Notepad++](https://notepad-plus-plus.org/)
+- [Ola Hallengren’s SQL Server Maintenance Solution](https://ola.hallengren.com/)
+- [PeaZip](https://peazip.github.io/)
+- [Sysinternals Suite](https://learn.microsoft.com/sysinternals/)
+- [WinMerge](https://winmerge.org/)
 
-### Performance Enhancements
-* Rebuilds/Reorganizes SQL Server indexes on all databases
-* Defragments the disk (vhd)
-* Sets Windows Defender rules to speed up compilation time
-* Prevents Management Reporter from automatically starting
+### Integrations / Interface testing
 
-### Miscellaneous
-* Sets the web browser homepage to the local environment URL
-* Set the password to never expire and disable change password menu item
-* Configures Windows Updates
-* Creates a logoff link on the desktop
-* Disables Bing search results
-* Disables Cortana
-* Disables Windows telemetry
-* Removes Metro apps on Windows 10
-* Sets power settings to high performance
-* Sets some privacy settings
-* Updates PowerShell command line help
+- [Fiddler](https://www.telerik.com/fiddler)
+- [Postman](https://www.postman.com/)
+- [Visual Studio Code](https://code.visualstudio.com/) with Azure & SQL extensions
 
-## Usage
-Before running this script, you should create the VM, either using LCS or the VHD, and start the environment.  The first hour may be Windows Updates and the "antimalware" executable doing a virus scan on the drive.  Once that has completed (possible reboot required), run the following command to execute the PowerShell script on the VM:
+### Performance enhancements
+
+- Rebuilds/reorganizes SQL Server indexes on all databases
+- Defragments the VHD
+- Adds Windows Defender exclusions to speed up X++ compilation
+- Prevents Management Reporter from auto-starting
+
+### Miscellaneous configuration
+
+- Sets the browser home page to the local D365FO URL
+- Sets the local admin password to **never expire** and hides “change password” menu if applicable
+- Configures Windows Updates
+- Creates a **Log off** shortcut on the desktop
+- Disables Bing web search in Start
+- Disables Cortana
+- Disables Windows telemetry (basic hardening)
+- Removes non-essential Windows 10 “Metro” apps
+- Sets Power plan to **High performance**
+- Applies additional privacy settings
+- Updates PowerShell help
+
+---
+
+## Prerequisites
+
+- A fresh D365FO Dev VM created via LCS or from the official VHD
+- Run as **Administrator** in a PowerShell console
+- Internet access (the script uses **Chocolatey** for several packages)
+- The first boot may run Windows Update and the **MsMpEng** scan; consider rebooting before starting
+
+---
+
+## Quick start
+
+Open **PowerShell (Admin)** in the VM and run:
 
 ```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/juliomutley/D365FO-Prepare-D365DevelopmentMachine/master/Prepare-D365DevelopmentMachine.ps1'))
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/velocifer-in/D365FO-Prepare-D365DevelopmentMachine/blob/master/Prepare-D365DevelopmentMachine.ps1'))
 ```
-Please record any problems encountered as issues to this repository.  Occasionally the tool used for automatic installations, Chocolately, will have an invlalid link to the installer for the software.  This is nothing we can change, however, it can be reported to the Chocolately project team.
 
-## d365fo.tools
-If you are not already using [d365fo.tools](https://github.com/d365collaborative/d365fo.tools) you should!  You can use the Install-D365SupportingSoftware command to install the packages this script does, quickly.
+> If the WebClient method is blocked by policy, use `Invoke-RestMethod` to save locally and execute:
+>
+> ```powershell
+> $uri = 'https://raw.githubusercontent.com/velocifer-in/D365FO-Prepare-D365DevelopmentMachine/blob/master/Prepare-D365DevelopmentMachine.ps1'
+> $dest = "$env:TEMP\Prepare-D365DevelopmentMachine.ps1"
+> Invoke-RestMethod -Uri $uri -OutFile $dest
+> powershell.exe -ExecutionPolicy Bypass -File $dest
+> ```
 
-## Contributions are Encouraged
-There are several ways to contribute or give thanks:
+---
 
-A. Fork this repository, commit the necessary changes to your forked repository, then issue a pull request.  This will notify me to review the changes, test them, and incorporate them into the main script.
+## Using d365fo.tools directly
 
-B. Comment on [the blog post at Calafell.me](http://calafell.me/automatically-prepare-a-development-vm-for-microsoft-dynamics-365-for-finance-and-operations/).  I will evaluate the suggestion and incorporate into the script.
+If you already use **d365fo.tools**, you can install much of the same software with:
 
-C. Tweet me at [@dodiggitydag](https://twitter.com/dodiggitydag).
+```powershell
+Install-D365SupportingSoftware
+```
+
+See the project for additional switches and options: https://github.com/d365collaborative/d365fo.tools
+
+---
+
+## Known issues & troubleshooting
+
+- **Chocolatey package links may change** over time. If an install fails with a 404/invalid hash, re-run later or report
+  the broken package to the Chocolatey maintainers.
+- Some changes (Windows Update, Defender, app removals) may require a reboot to complete.
+- Corporate policies may block script download or execution. Use the `Invoke-RestMethod` flow above or download via a
+  browser and run with `-ExecutionPolicy Bypass`.
+
+---
+
+## Contributing
+
+1. Fork the repo, make changes, and open a PR.
+2. Or comment on the original blog
+   post: [Calafell.me](http://calafell.me/automatically-prepare-a-development-vm-for-microsoft-dynamics-365-for-finance-and-operations/)
+3. Or reach out on Twitter/X: [@dodiggitydag](https://twitter.com/dodiggitydag)
+
+---
+
+## Feature parity checklist (for maintainers)
+
+Use this when updating the script to ensure it matches the README.
+
+- [ ] Installs all utilities listed above (Az PowerShell, Azure CLI, d365fo.tools, dbatools, Edge, Notepad++, Ola
+  scripts, PeaZip, Sysinternals, WinMerge)
+- [ ] Installs Fiddler, Postman, VS Code with Azure & SQL extensions
+- [ ] Performs SQL index maintenance across all DBs
+- [ ] Defragments the VHD
+- [ ] Adds Defender exclusions tuned for D365FO/X++ builds
+- [ ] Disables Management Reporter auto-start
+- [ ] Applies all miscellaneous config (homepage, password policy, Windows Update, desktop logoff link, disable Bing web
+  search, Cortana, telemetry, remove Metro apps, set High performance power plan, privacy settings, update PS help)
+- [ ] Uses Chocolatey consistently where practical; falls back to vendor installers if needed
+- [ ] Writes clear logs and exits non-zero on hard failures
+
+---
+
+## Changelog
+
+- **2025-08-09:** Updated README links (Az PowerShell), corrected typos (Chocolatey), clarified prerequisites, added
+  Quick start alternative, and added feature parity checklist.

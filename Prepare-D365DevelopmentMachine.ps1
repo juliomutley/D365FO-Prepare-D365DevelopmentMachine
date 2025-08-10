@@ -82,7 +82,7 @@ Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 if (Get-Module -ListAvailable -Name d365fo.tools)
 {
     Write-Host "Updating d365fo.tools"
-    Update-Module -Name d365fo.tools
+    Update-Module -Name d365fo.tools -Force -SkipPublisherCheck -AllowClobber
 }
 else
 {
@@ -566,7 +566,7 @@ If (Test-Path "HKLM:\Software\Microsoft\Microsoft SQL Server\Instance Names\SQL"
     if (Get-Module -ListAvailable -Name dbatools)
     {
         Write-Host "Updating dbatools"
-        Update-Module -Name dbatools
+        Update-Module -Name dbatools -Force -SkipPublisherCheck -AllowClobber
     }
     else
     {

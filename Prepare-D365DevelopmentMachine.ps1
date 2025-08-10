@@ -149,6 +149,45 @@ Else
 
 
 
+# Helper: Safely rearm Windows license if possible
+function Invoke-RearmWindowsSafe
+{
+    try
+    {
+        # Ensure Software Protection service (sppsvc) exists and is running
+        $svc = Get-Service -Name sppsvc -ErrorAction SilentlyContinue
+        if ($null -eq $svc)
+        {
+            Write-Host "Software Protection service (sppsvc) not found. Skipping Windows rearm."
+            return
+        }
+        if ($svc.Status -ne 'Running')
+        {
+            Write-Host "Starting Software Protection service (sppsvc)..."
+            Start-Service -Name sppsvc -ErrorAction Stop
+        }
+
+        # Query remaining rearm count
+        $sls = Get-CimInstance -ClassName SoftwareLicensingService -ErrorAction Stop
+        $remaining = $sls.RemainingWindowsReArmCount
+        Write-Host "Remaining Windows rearm count: $remaining"
+        if ($remaining -le 0)
+        {
+            Write-Warning "No remaining Windows rearms. Skipping rearm."
+            return
+        }
+
+        # Attempt the rearm
+        $result = Invoke-CimMethod -InputObject $sls -MethodName ReArmWindows -ErrorAction Stop
+        Write-Host "ReArmWindows invoked (ReturnValue=$( $result.ReturnValue )). A reboot may be required."
+    }
+    catch
+    {
+        Write-Warning ("Windows rearm failed: {0}" -f $_.Exception.Message)
+        Write-Warning "Non-fatal: continuing. Check activation with 'slmgr.vbs /dlv' or rearm manually with 'slmgr.vbs /rearm'."
+    }
+}
+
 #region Optimizing using d365fo.tools
 if (Get-Module -ListAvailable -Name d365fo.tools)
 {
@@ -162,7 +201,7 @@ if (Get-Module -ListAvailable -Name d365fo.tools)
     Add-D365WindowsDefenderRules -Silent
 
     Write-Host "Rearming Windows license"
-    Invoke-D365ReArmWindows
+    Invoke-RearmWindowsSafe
 }
 #endregion
 

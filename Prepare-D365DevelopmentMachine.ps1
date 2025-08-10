@@ -82,7 +82,7 @@ Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 if (Get-Module -ListAvailable -Name d365fo.tools)
 {
     Write-Host "Updating d365fo.tools"
-    Update-Module -Name d365fo.tools -Force -SkipPublisherCheck -AllowClobber
+    Update-Module -Name d365fo.tools
 }
 else
 {

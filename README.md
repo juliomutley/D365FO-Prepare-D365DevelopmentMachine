@@ -62,13 +62,13 @@ Open **PowerShell (Admin)** in the VM and run:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
-iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/velocifer-in/D365FO-Prepare-D365DevelopmentMachine/blob/master/Prepare-D365DevelopmentMachine.ps1'))
+iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/velocifer-in/D365FO-Prepare-D365DevelopmentMachine/master/Prepare-D365DevelopmentMachine.ps1'))
 ```
 
 > If the WebClient method is blocked by policy, use `Invoke-RestMethod` to save locally and execute:
 >
 > ```powershell
-> $uri = 'https://raw.githubusercontent.com/velocifer-in/D365FO-Prepare-D365DevelopmentMachine/blob/master/Prepare-D365DevelopmentMachine.ps1'
+> $uri = 'https://raw.githubusercontent.com/velocifer-in/D365FO-Prepare-D365DevelopmentMachine/master/Prepare-D365DevelopmentMachine.ps1'
 > $dest = "$env:TEMP\Prepare-D365DevelopmentMachine.ps1"
 > Invoke-RestMethod -Uri $uri -OutFile $dest
 > powershell.exe -ExecutionPolicy Bypass -File $dest

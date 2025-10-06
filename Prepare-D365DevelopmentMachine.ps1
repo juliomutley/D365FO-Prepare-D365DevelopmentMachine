@@ -470,6 +470,8 @@ Function Execute-Sql {
 
 If (Test-Path "HKLM:\Software\Microsoft\Microsoft SQL Server\Instance Names\SQL") {
 
+    Enable-D365SqlChangeTracking
+
     #Alocating 70% of the total server memory for sql server
     $totalServerMemory = Get-WMIObject -Computername . -class win32_ComputerSystem | Select-Object -Expand TotalPhysicalMemory
     $memoryForSqlServer = ($totalServerMemory * 0.7) / 1024 / 1024
